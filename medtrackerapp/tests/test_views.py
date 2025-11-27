@@ -1,8 +1,9 @@
+from django.utils import timezone
+from datetime import timedelta
+from unittest.mock import patch
 from rest_framework.test import APITestCase
 from rest_framework import status
 from django.urls import reverse
-from django.utils import timezone
-from datetime import timedelta
 
 from medtrackerapp.models import Medication, DoseLog
 
@@ -70,6 +71,38 @@ class MedicationViewTests(APITestCase):
         response = self.client.delete(url)
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
         self.assertEqual(Medication.objects.count(), 0)
+
+
+class MedicationExternalInfoViewTests(APITestCase):
+    """Tests for /medications/<id>/info/ endpoint using mocked service calls."""
+
+    def setUp(self):
+        self.med = Medication.objects.create(
+            name="Aspirin",
+            dosage_mg=100,
+            prescribed_per_day=2
+        )
+        self.url = reverse("medication-get-external-info", args=[self.med.id])
+
+    @patch("medtrackerapp.models.Medication.fetch_external_info")
+    def test_view_external_info_success(self, mock_fetch):
+        """Mock successful external info response."""
+        mock_fetch.return_value = {"name": "Aspirin", "manufacturer": "Pfizer"}
+
+        response = self.client.get(self.url)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data["manufacturer"], "Pfizer")
+
+    @patch("medtrackerapp.models.Medication.fetch_external_info")
+    def test_view_external_api_error(self, mock_fetch):
+        """Mock external API error and ensure view returns 502."""
+        mock_fetch.return_value = {"error": "service unavailable"}
+
+        response = self.client.get(self.url)
+
+        self.assertEqual(response.status_code, status.HTTP_502_BAD_GATEWAY)
+        self.assertIn("error", response.data)
 
 
 class DoseLogViewTests(APITestCase):
