@@ -16,7 +16,7 @@ jobs:
         image: postgres:18
         env:
           POSTGRES_USER: Developer
-          POSTGRES_PASSWORD: test
+          POSTGRES_PASSWORD: test1
           POSTGRES_DB: medtracker_db
         ports:
           - 5432:5432
