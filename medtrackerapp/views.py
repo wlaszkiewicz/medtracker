@@ -4,6 +4,9 @@ from rest_framework.response import Response
 from django.utils.dateparse import parse_date
 from .models import Medication, DoseLog
 from .serializers import MedicationSerializer, DoseLogSerializer
+from .models import Note
+from .serializers import NoteSerializer
+
 
 class MedicationViewSet(viewsets.ModelViewSet):
     """
@@ -51,6 +54,51 @@ class MedicationViewSet(viewsets.ModelViewSet):
             return Response(data, status=status.HTTP_502_BAD_GATEWAY)
         return Response(data)
 
+
+    @action(detail=True, methods=["get"], url_path="expected-doses")
+    def expected_doses_view(self, request, pk=None):
+        """
+        Retrieve the expected doses of a medication over a specified number of days.
+
+        This method is a custom action for the `MedicationViewSet` that calculates
+        the expected doses of a medication based on the `days` query parameter.
+
+        Args:
+            request (Request): The current HTTP request, which should include the
+                `days` query parameter specifying the number of days.
+            pk (int): The primary key of the medication record.
+
+        Returns:
+            Response:
+                - 200 OK: A JSON object containing the medication ID, the number of days,
+                  and the calculated expected doses.
+                - 400 BAD REQUEST: If the `days` parameter is missing, invalid, or if
+                  the calculation raises a `ValueError`.
+
+        """
+        medication = self.get_object()
+
+        days_param = request.query_params.get("days")
+
+        try:
+            if days_param is None:
+                raise ValueError("Missing 'days' parameter")
+            days = int(days_param)
+            if days <= 0:
+                raise ValueError("'days' must be positive")
+        except (ValueError, TypeError):
+            return Response({"error": "Invalid 'days' parameter"}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            doses = medication.expected_doses(days)
+        except ValueError as exc:
+            return Response({"error": str(exc)}, status=status.HTTP_400_BAD_REQUEST)
+
+        return Response({
+            "medication_id": medication.id,
+            "days": days,
+            "expected_doses": doses
+        }, status=status.HTTP_200_OK)
 
 class DoseLogViewSet(viewsets.ModelViewSet):
     """
@@ -105,3 +153,23 @@ class DoseLogViewSet(viewsets.ModelViewSet):
 
         serializer = self.get_serializer(logs, many=True)
         return Response(serializer.data)
+
+
+class NoteViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint for managing notes.
+
+    This viewset provides standard CRUD operations for the `Note` model.
+    It allows creating, retrieving, listing, and deleting notes, while
+    restricting unsupported HTTP methods like PUT and PATCH.
+
+    Attributes:
+        queryset (QuerySet): The set of `Note` objects to be managed by this viewset.
+        serializer_class (Serializer): The serializer class used to convert `Note` objects
+            to and from JSON representations.
+        http_method_names (list): The list of allowed HTTP methods for this viewset.
+    """
+    queryset = Note.objects.all()
+    serializer_class = NoteSerializer
+
+    http_method_names = ["get", "post", "delete", "head", "options"]
