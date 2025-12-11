@@ -131,10 +131,24 @@ class DoseLog(models.Model):
 
 
 class Note(models.Model):
-    medication = models.ForeignKey(Medication, on_delete=models.CASCADE)
-    text = models.TextField()
-    created_at = models.DateTimeField(auto_now_add=True)
+    """
+    Represents a note associated with a specific medication.
+
+    Each note contains text describing additional information or instructions
+    related to the medication and is timestamped with its creation date.
+    """
+
+    medication = models.ForeignKey(
+        Medication,
+        on_delete=models.CASCADE,
+        help_text="The medication this note is associated with."
+    )
+    text = models.TextField(help_text="The content of the note.")
+    created_at = models.DateTimeField(
+        auto_now_add=True,
+        help_text="The date and time when the note was created."
+    )
 
     def __str__(self):
+        """Return a human-readable string representation of the note."""
         return f"Note for {self.medication.name} at {self.created_at.strftime('%Y-%m-%d %H:%M')}"
-

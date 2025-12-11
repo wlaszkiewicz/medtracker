@@ -156,6 +156,19 @@ class DoseLogViewSet(viewsets.ModelViewSet):
 
 
 class NoteViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint for managing notes.
+
+    This viewset provides standard CRUD operations for the `Note` model.
+    It allows creating, retrieving, listing, and deleting notes, while
+    restricting unsupported HTTP methods like PUT and PATCH.
+
+    Attributes:
+        queryset (QuerySet): The set of `Note` objects to be managed by this viewset.
+        serializer_class (Serializer): The serializer class used to convert `Note` objects
+            to and from JSON representations.
+        http_method_names (list): The list of allowed HTTP methods for this viewset.
+    """
     queryset = Note.objects.all()
     serializer_class = NoteSerializer
 
