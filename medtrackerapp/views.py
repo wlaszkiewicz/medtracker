@@ -4,6 +4,9 @@ from rest_framework.response import Response
 from django.utils.dateparse import parse_date
 from .models import Medication, DoseLog
 from .serializers import MedicationSerializer, DoseLogSerializer
+from .models import Note
+from .serializers import NoteSerializer
+
 
 class MedicationViewSet(viewsets.ModelViewSet):
     """
@@ -150,3 +153,10 @@ class DoseLogViewSet(viewsets.ModelViewSet):
 
         serializer = self.get_serializer(logs, many=True)
         return Response(serializer.data)
+
+
+class NoteViewSet(viewsets.ModelViewSet):
+    queryset = Note.objects.all()
+    serializer_class = NoteSerializer
+
+    http_method_names = ["get", "post", "delete", "head", "options"]

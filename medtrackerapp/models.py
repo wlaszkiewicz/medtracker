@@ -4,6 +4,7 @@ from django.utils import timezone
 from .services import DrugInfoService
 
 
+
 class Medication(models.Model):
     """
     Represents a prescribed medication with dosage and daily schedule.
@@ -127,3 +128,13 @@ class DoseLog(models.Model):
         status = "Taken" if self.was_taken else "Missed"
         when = timezone.localtime(self.taken_at).strftime("%Y-%m-%d %H:%M")
         return f"{self.medication.name} at {when} - {status}"
+
+
+class Note(models.Model):
+    medication = models.ForeignKey(Medication, on_delete=models.CASCADE)
+    text = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Note for {self.medication.name} at {self.created_at.strftime('%Y-%m-%d %H:%M')}"
+
