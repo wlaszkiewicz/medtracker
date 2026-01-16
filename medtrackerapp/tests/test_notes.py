@@ -23,6 +23,7 @@ class NoteViewTests(APITestCase):
 
     def test_list_notes(self):
         """Listing notes returns all existing notes."""
+        Note.objects.create(medication=self.med, text="List me")
         response = self.client.get(self.list_url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), 1)
