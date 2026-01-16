@@ -6,6 +6,7 @@ from .models import Medication, DoseLog
 from .serializers import MedicationSerializer, DoseLogSerializer
 from .models import Note
 from .serializers import NoteSerializer
+from rest_framework.filters import SearchFilter
 
 
 class MedicationViewSet(viewsets.ModelViewSet):
@@ -171,5 +172,8 @@ class NoteViewSet(viewsets.ModelViewSet):
     """
     queryset = Note.objects.all()
     serializer_class = NoteSerializer
+
+    filter_backends = (SearchFilter,)
+    search_fields = ["medication__name"]
 
     http_method_names = ["get", "post", "delete", "head", "options"]
