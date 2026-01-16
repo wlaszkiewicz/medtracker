@@ -12,14 +12,16 @@ class DrugInfoServiceTests(APITestCase):
         mock_response = MagicMock()
         mock_response.status_code = 200
         mock_response.json.return_value = {
-            "results": [{
-                "openfda": {
-                    "generic_name": ["ibuprofen"],
-                    "manufacturer_name": ["Bayer"]
-                },
-                "warnings": ["Do not exceed 6 pills per day"],
-                "purpose": ["Pain relief"]
-            }]
+            "results": [
+                {
+                    "openfda": {
+                        "generic_name": ["ibuprofen"],
+                        "manufacturer_name": ["Bayer"],
+                    },
+                    "warnings": ["Do not exceed 6 pills per day"],
+                    "purpose": ["Pain relief"],
+                }
+            ]
         }
         mock_get.return_value = mock_response
 

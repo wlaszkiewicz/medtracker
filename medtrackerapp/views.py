@@ -25,6 +25,7 @@ class MedicationViewSet(viewsets.ModelViewSet):
         - DELETE /medications/{id}/ — delete a medication
         - GET /medications/{id}/info/ — fetch external drug info from OpenFDA
     """
+
     queryset = Medication.objects.all()
     serializer_class = MedicationSerializer
 
@@ -54,7 +55,6 @@ class MedicationViewSet(viewsets.ModelViewSet):
         if isinstance(data, dict) and data.get("error"):
             return Response(data, status=status.HTTP_502_BAD_GATEWAY)
         return Response(data)
-
 
     @action(detail=True, methods=["get"], url_path="expected-doses")
     def expected_doses_view(self, request, pk=None):
@@ -88,18 +88,21 @@ class MedicationViewSet(viewsets.ModelViewSet):
             if days <= 0:
                 raise ValueError("'days' must be positive")
         except (ValueError, TypeError):
-            return Response({"error": "Invalid 'days' parameter"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {"error": "Invalid 'days' parameter"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
         try:
             doses = medication.expected_doses(days)
         except ValueError as exc:
             return Response({"error": str(exc)}, status=status.HTTP_400_BAD_REQUEST)
 
-        return Response({
-            "medication_id": medication.id,
-            "days": days,
-            "expected_doses": doses
-        }, status=status.HTTP_200_OK)
+        return Response(
+            {"medication_id": medication.id, "days": days, "expected_doses": doses},
+            status=status.HTTP_200_OK,
+        )
+
 
 class DoseLogViewSet(viewsets.ModelViewSet):
     """
@@ -118,6 +121,7 @@ class DoseLogViewSet(viewsets.ModelViewSet):
         - GET /logs/filter/?start=YYYY-MM-DD&end=YYYY-MM-DD —
           filter logs within a date range
     """
+
     queryset = DoseLog.objects.all()
     serializer_class = DoseLogSerializer
 
@@ -143,14 +147,17 @@ class DoseLogViewSet(viewsets.ModelViewSet):
 
         if not start or not end:
             return Response(
-                {"error": "Both 'start' and 'end' query parameters are required and must be valid dates."},
-                status=status.HTTP_400_BAD_REQUEST
+                {
+                    "error": "Both 'start' and 'end' query parameters are required and must be valid dates."
+                },
+                status=status.HTTP_400_BAD_REQUEST,
             )
 
-        logs = self.get_queryset().filter(
-            taken_at__date__gte=start,
-            taken_at__date__lte=end
-        ).order_by("taken_at")
+        logs = (
+            self.get_queryset()
+            .filter(taken_at__date__gte=start, taken_at__date__lte=end)
+            .order_by("taken_at")
+        )
 
         serializer = self.get_serializer(logs, many=True)
         return Response(serializer.data)
@@ -170,6 +177,7 @@ class NoteViewSet(viewsets.ModelViewSet):
             to and from JSON representations.
         http_method_names (list): The list of allowed HTTP methods for this viewset.
     """
+
     queryset = Note.objects.all()
     serializer_class = NoteSerializer
 
