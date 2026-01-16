@@ -435,7 +435,13 @@ paths:
         It allows creating, retrieving, listing, and deleting notes, while
 
         restricting unsupported HTTP methods like PUT and PATCH.'
-      parameters: []
+      parameters:
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
       responses:
         '200':
           content:
@@ -496,6 +502,12 @@ paths:
         description: A unique integer value identifying this note.
         schema:
           type: string
+      - name: search
+        required: false
+        in: query
+        description: A search term.
+        schema:
+          type: string
       responses:
         '200':
           content:
@@ -520,6 +532,12 @@ paths:
         in: path
         required: true
         description: A unique integer value identifying this note.
+        schema:
+          type: string
+      - name: search
+        required: false
+        in: query
+        description: A search term.
         schema:
           type: string
       responses:
