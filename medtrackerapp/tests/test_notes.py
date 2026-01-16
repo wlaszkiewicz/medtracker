@@ -4,11 +4,14 @@ from django.urls import reverse
 from medtrackerapp.models import Medication
 from medtrackerapp.models import Note
 
+
 class NoteViewTests(APITestCase):
     """Tests for /api/notes/ endpoint."""
 
     def setUp(self):
-        self.med = Medication.objects.create(name="Aspirin", dosage_mg=100, prescribed_per_day=2)
+        self.med = Medication.objects.create(
+            name="Aspirin", dosage_mg=100, prescribed_per_day=2
+        )
         self.list_url = reverse("note-list")
 
     def test_create_note(self):

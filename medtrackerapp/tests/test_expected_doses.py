@@ -3,16 +3,18 @@ from rest_framework import status
 from django.urls import reverse
 from medtrackerapp.models import Medication
 
+
 class MedicationExpectedDosesTests(APITestCase):
     """Tests for GET /api/medications/<id>/expected-doses/?days=X"""
 
     def setUp(self):
         self.med = Medication.objects.create(
-            name="Aspirin",
-            dosage_mg=100,
-            prescribed_per_day=2
+            name="Aspirin", dosage_mg=100, prescribed_per_day=2
         )
-        self.url = lambda days: reverse("medication-expected-doses-view", args=[self.med.id]) + f"?days={days}"
+        self.url = (
+            lambda days: reverse("medication-expected-doses-view", args=[self.med.id])
+            + f"?days={days}"
+        )
 
     def test_expected_doses_valid(self):
         """Valid days parameter returns correct expected doses"""

@@ -13,12 +13,9 @@ class MedicationViewTests(APITestCase):
 
     def setUp(self):
         self.med = Medication.objects.create(
-            name="Aspirin",
-            dosage_mg=100,
-            prescribed_per_day=2
+            name="Aspirin", dosage_mg=100, prescribed_per_day=2
         )
         self.list_url = reverse("medication-list")
-
 
     def test_list_medications_valid_data(self):
         """List endpoint returns existing medications."""
@@ -29,11 +26,7 @@ class MedicationViewTests(APITestCase):
 
     def test_create_medication_valid(self):
         """Create a medication with valid data."""
-        data = {
-            "name": "Ibuprofen",
-            "dosage_mg": 200,
-            "prescribed_per_day": 3
-        }
+        data = {"name": "Ibuprofen", "dosage_mg": 200, "prescribed_per_day": 3}
         response = self.client.post(self.list_url, data)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(Medication.objects.count(), 2)
@@ -78,9 +71,7 @@ class MedicationExternalInfoViewTests(APITestCase):
 
     def setUp(self):
         self.med = Medication.objects.create(
-            name="Aspirin",
-            dosage_mg=100,
-            prescribed_per_day=2
+            name="Aspirin", dosage_mg=100, prescribed_per_day=2
         )
         self.url = reverse("medication-get-external-info", args=[self.med.id])
 
@@ -115,14 +106,10 @@ class DoseLogViewTests(APITestCase):
         now = timezone.now()
 
         self.log1 = DoseLog.objects.create(
-            medication=self.med,
-            taken_at=now - timedelta(days=2),
-            was_taken=True
+            medication=self.med, taken_at=now - timedelta(days=2), was_taken=True
         )
         self.log2 = DoseLog.objects.create(
-            medication=self.med,
-            taken_at=now - timedelta(days=1),
-            was_taken=False
+            medication=self.med, taken_at=now - timedelta(days=1), was_taken=False
         )
 
         self.list_url = reverse("doselog-list")
@@ -176,10 +163,13 @@ class DoseLogViewTests(APITestCase):
     def test_filter_logs_valid_range(self):
         """Filtering logs by valid start/end dates returns correct results."""
         url = reverse("doselog-filter-by-date")
-        response = self.client.get(url, {
-            "start": (timezone.now() - timedelta(days=3)).date().isoformat(),
-            "end": timezone.now().date().isoformat()
-        })
+        response = self.client.get(
+            url,
+            {
+                "start": (timezone.now() - timedelta(days=3)).date().isoformat(),
+                "end": timezone.now().date().isoformat(),
+            },
+        )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data), 2)
 
